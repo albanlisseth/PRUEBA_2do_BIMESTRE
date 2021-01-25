@@ -1,0 +1,179 @@
+﻿import processing.serial.*;
+import ddf.minim.*;
+PImage i1;
+Serial port;
+    int w=1;
+
+int    a=0;
+int    s=0;
+int    leer=1;
+int    xx=0;
+int    yy=0;
+int    x=0;
+int    y=0;
+int    xaux=0;
+int    yaux=0;
+int    fil=0;
+int[][] matriz={
+{170,67},
+{180,80},
+{170,65},
+{178,75},
+{160,55},
+{163,60},
+{165,63},
+{170,70},
+{164,62},
+{176,77},
+{164,60},
+{170,76},
+{170,56},
+{168,60},
+};
+
+void setup()
+{
+port= new Serial(this, "COM10",9600);
+delay(500);
+
+  size(900,600);
+  background(0);
+  inicio();
+}
+
+void fondo()
+{
+background(0);
+i1=loadImage("1.png");
+imageMode(CORNER);
+tint(80,50);
+image(i1, 0, 0, 800, 600); 
+}
+
+
+
+void draw() {
+inicio();
+delay(1000);
+fondo();
+fondodatos();
+}
+void inicio()
+{
+fondo();
+textSize(30);
+fill(255);
+stroke(0);
+text("Machine Learning\nExamen final sistemas embebidos\n2021\n\nIngrese datos  ",100,200);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void estimar()
+{
+//rectandulo de y estimada
+fill(10);
+stroke(255);
+rect(700, 142, 100, 27);
+port.write(s);
+
+
+text(yy+" Kg",717,162);
+xaux=15*xx-2150;// calibrado con excel desde 150 a 190
+yaux=-6*yy+795;  // desde 45 a 95
+noStroke();  
+fill(#FFEA00);
+if( w==2)
+{
+ellipse(xaux,yaux,3,3);
+w=0;
+}
+}
+
+//void serialEvent(Serial port)
+//{
+//  yy=port.read();
+//  println(xx);
+//}
+  
+ 
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+void fondodatos()
+{
+  
+    while (port.available()>0)
+  {
+     xx=port.read();
+     yy=port.read();
+  }
+    
+      x= xx;
+   {   xaux=15*x-2150;} // calibrado con excel desde 150 a 190
+    y= yy;
+  
+ {yaux=-6*y+795;}  // desde 45 a 95
+   noStroke();  
+   fill(#32FF0A);
+   ellipse(xaux,yaux,3,3);
+    
+    
+text("Regresión",100,100);
+int    ejx=100;
+int    ejy=0;
+
+//rectandulo de y estimada
+fill(10);
+stroke(255);
+rect(700, 142, 100, 27);
+
+textSize(23);
+fill(255);
+stroke(0);
+text(xx+" cm",172,163);
+line(320,142+13,340,142+13);
+
+textSize(13);
+int avancex=120;
+//imprime eje x de 150 a 90
+for(int i=95;i<=700;i=i+avancex)
+{
+ejx=round(0.066666*i+143.67);
+text(ejx,i,542);
+
+}
+
+//imprime eje y desde 45 a 95
+int avancey=60;
+for(int i=525;i>=225;i=i-avancey)
+{
+ejy=round(-0.166666*i+132.5);
+text(ejy,75,i);
+}
+
+text("Altura (cm)",370,575);
+text("Peso (Kg)",10,378);
+
+
+noFill();
+stroke(255);
+rect(100, 225, 600, 300);
+
+for (int i=0;i<14;i++)
+  {
+   
+   x= matriz[i][0];
+   {   xaux=15*x-2150;} // calibrado con excel desde 150 a 190
+    y= matriz[i][1];
+  
+ {yaux=-6*y+795;}  // desde 45 a 95
+   noStroke();  
+   fill(255,0,0);
+   ellipse(xaux,yaux,3,3);
+   delay(10);
+  }
+  textSize(18);
+fill(255);
+text(yy+" Kg",717,162);
+}

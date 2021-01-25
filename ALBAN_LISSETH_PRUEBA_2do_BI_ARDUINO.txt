@@ -1,0 +1,96 @@
+﻿#include <SoftwareSerial.h>
+#define rxPin 2
+#define txPin 3
+#include "LowPower.h"
+
+SoftwareSerial  serial2 (rxPin, txPin);
+
+
+
+float matriz [23][2]={
+{89,7.8},
+{67,7.5},
+{45,7.4},
+{67,7.5},
+{45,6.9},
+{78,6.8},
+{123,6.5},
+{187,5.5},
+{190,5.6},
+{245,4.7},
+{267,4.7},
+{367,4.5},
+{398,4.3},
+{467,4.2},
+{478,4.3},
+{674,4},
+{756,3.7},
+{756,3.6},
+{821,3.5},
+{834,3.4},
+{914,3.5},
+{945,3.6},
+{977,3.3},
+};
+// aproximación
+float n=23;
+float Ex=0;
+float Ey=0;
+float Elogx=0;
+float Elogy=0;
+float Elogxlogy=0;
+float Elogx2=0;
+float B=0;
+float A=0;
+
+//interfaz
+int aux=0;
+int x=0;
+
+//reinicio
+unsigned long tiempo=0;
+float set=0;
+
+void setup() {
+pinMode(rxPin,INPUT);
+pinMode(txPin,OUTPUT);
+serial2.begin(9600);
+pinMode(13,OUTPUT);
+Serial.begin(9600);
+Serial.setTimeout(100);
+for (int fil = 0; fil < n; fil++) 
+{
+Ex=Ex+matriz[fil][0];
+Ey=Ey+matriz[fil][1];
+Elogy=log10(matriz[fil][1])+Elogy;
+Elogx=log10(matriz[fil][0])+Elogx;
+Elogxlogy=log10(matriz[fil][1])*log10(matriz[fil][0])+Elogxlogy;
+Elogx2=log10(matriz[fil][0])*log10(matriz[fil][0])+Elogx2;
+}
+B=(n*Elogxlogy-(Elogx*Elogy))/((n*Elogx2)-Elogx*Elogx);
+A=pow(10,(Elogy/n)-B*Elogx/n);
+
+// T=22.824*CAD^-0.275
+}
+
+void loop() {
+set=analogRead(0)*8;
+digitalWrite(13,LOW);
+tiempo=millis();
+if (tiempo<set)
+{
+LowPower.idle(SLEEP_FOREVER, ADC_OFF, TIMER2_ON, TIMER1_ON, TIMER0_ON,SPI_OFF, USART0_OFF, TWI_OFF);
+}
+else
+{
+digitalWrite(13,HIGH);
+ set=analogRead(0);
+Serial.println(set);
+delay(50);
+asm("jmp 0x0000");
+}
+
+
+
+
+}
